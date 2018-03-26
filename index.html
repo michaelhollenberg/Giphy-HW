@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Mike Hollenberg HW 5</title>
+</head>
+
+<body>
+
+    <div id="sports-view"></div>
+        
+    <form id="sport-form">
+            <label for="sport-input">Add a sport</label>
+            <input type="text" id="sport-input"><br>
+        
+              
+            <input id="add-sport" type="submit" value="Add a sport">
+        </form>
+  
+
+  <div id="gifs-appear-here">
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    var sportsArray = ["baseball","football"];
+    
+    function renderButtons() {
+
+       
+        $("#sports-view").empty();
+
+        
+        for (var i = 0; i < sportsArray.length; i++) {
+
+          
+          var a = $("<button>");
+          
+          a.addClass("sports");
+          
+          a.attr("data-name", sportsArray[i]);
+          a.attr("id","sportButton"+ i);
+          a.attr("data-number",i);
+          
+          a.text(sportsArray[i]);
+          
+          $("#sports-view").append(a);
+        }
+    }
+    renderButtons();
+    
+    
+    $("#add-sport").on("click", function(event){
+        
+        var sport = $("#sport-input").val().trim();
+        sportsArray.push(sport);
+        
+        renderButtons();
+        event.preventDefault();
+        
+    });
+   
+    $("#sports-view").on("click","button", function() {
+      var sport = $(this).attr("data-name");
+      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+        sport + "&api_key=dc6zaTOxFJmzC&limit=10";
+        
+        
+      $.ajax({
+        url: queryURL,
+        method: "GET"
+      })
+        .then(function(response) {
+          var results = response.data;
+          console.log(sportsArray);
+          for (var i = 0; i < results.length; i++) {
+            var gifDiv = $("<div class='item'>");
+
+            var rating = results[i].rating;
+
+            var p = $("<p>").text("Rating: " + rating);
+
+            var sportImage = $("<img>");
+            sportImage.attr("src", results[i].images.fixed_height.url);
+
+            gifDiv.prepend(p);
+            gifDiv.prepend(sportImage);
+
+            $("#gifs-appear-here").prepend(gifDiv);
+          }
+        });
+    });
+  </script>
+</body>
+
+</html>
